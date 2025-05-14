@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+
+{% block title %}Бронирование №{{ booking.id }} — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Бронирование №{{ booking.id }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <a href="{{ url_for('booking.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к списку
+        </a>
+        <a href="{{ url_for('booking.edit', booking_id=booking.id) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Редактировать
+        </a>
+        <a href="{{ url_for('booking.rooms', booking_id=booking.id) }}" class="btn btn-info">
+            <i class="fas fa-hotel"></i> Управление номерами
+        </a>
+        <a href="{{ url_for('booking.services', booking_id=booking.id) }}" class="btn btn-success">
+            <i class="fas fa-concierge-bell"></i> Управление услугами
+        </a>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="fas fa-trash"></i> Удалить
+        </button>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Информация о бронировании -->
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Информация о бронировании</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-id-card"></i> ID бронирования:</span>
+                        <span class="badge bg-primary rounded-pill">{{ booking.id }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-calendar-alt"></i> Дата заезда:</span>
+                        <span>{{ booking.check_in_date.strftime('%d.%m.%Y') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-calendar-alt"></i> Дата выезда:</span>
+                        <span>{{ booking.check_out_date.strftime('%d.%m.%Y') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-calendar-day"></i> Дата бронирования:</span>
+                        <span>{{ booking.booking_date.strftime('%d.%m.%Y') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-hotel"></i> Количество номеров:</span>
+                        <span class="badge bg-info rounded-pill">{{ booking.total_rooms }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-users"></i> Количество гостей:</span>
+                        <span class="badge bg-info rounded-pill">{{ booking.total_persons }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-check-circle"></i> Статус:</span>
+                        <span>
+                            {% if booking.status == 'Забронировано' %}
+                                <span class="badge bg-primary">{{ booking.status }}</span>
+                            {% elif booking.status == 'Отменено' %}
+                                <span class="badge bg-danger">{{ booking.status }}</span>
+                            {% elif booking.status == 'Завершено' %}
+                                <span class="badge bg-success">{{ booking.status }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ booking.status }}</span>
+                            {% endif %}
+                        </span>
+                    </li>
+                </ul>
+                
+                <!-- Форма изменения статуса -->
+                <form action="{{ url_for('booking.update_status', booking_id=booking.id) }}" method="post" class="mb-3">
+                    <div class="input-group">
+                        <select class="form-select" name="status" required>
+                            <option value="Забронировано" {% if booking.status == 'Забронировано' %}selected{% endif %}>Забронировано</option>
+                            <option value="Отменено" {% if booking.status == 'Отменено' %}selected{% endif %}>Отменено</option>
+                            <option value="Завершено" {% if booking.status == 'Завершено' %}selected{% endif %}>Завершено</option>
+                        </select>
+                        <button class="btn btn-outline-primary" type="submit">Изменить статус</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Информация о клиенте -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Информация о клиенте</h5>
+            </div>
+            <div class="card-body">
+                {% if booking.guest_id %}
+                    <h6 class="mb-3">Гость</h6>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-user"></i> ФИО:</span>
+                            <span>
+                                {{ booking.last_name }} {{ booking.first_name }} {{ booking.middle_name or '' }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-phone"></i> Телефон:</span>
+                            <span>{{ booking.guest_phone or 'Не указан' }}</span>
+                        </li>
+                    </ul>
+                    <a href="{{ url_for('guest.show', guest_id=booking.guest_id) }}" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-user"></i> Подробнее о госте
+                    </a>
+                {% elif booking.firm_id %}
+                    <h6 class="mb-3">Организация</h6>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-building"></i> Название:</span>
+                            <span>{{ booking.firm_name }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-phone"></i> Телефон:</span>
+                            <span>{{ booking.firm_phone or 'Не указан' }}</span>
+                        </li>
+                    </ul>
+                    <a href="{{ url_for('firm.show', firm_id=booking.firm_id) }}" class="btn btn-sm btn-outline-info">
+                        <i class="fas fa-building"></i> Подробнее о фирме
+                    </a>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Информация о клиенте не найдена
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Финансовая информация и номера -->
+    <div class="col-md-6">
+        <!-- Сводка по стоимости -->
+        {% if cost_summary %}
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Финансовая сводка</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-calendar-day"></i> Количество дней:</span>
+                        <span class="badge bg-primary rounded-pill">{{ cost_summary.days }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-bed"></i> Стоимость проживания:</span>
+                        <span>{{ cost_summary.rooms_cost }} руб.</span>
+                    </li>
+                    {% if cost_summary.discount_rate > 0 %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-percentage"></i> Скидка ({{ cost_summary.discount_rate }}%):</span>
+                        <span class="text-danger">-{{ cost_summary.discount_amount }} руб.</span>
+                    </li>
+                    {% endif %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-concierge-bell"></i> Стоимость услуг:</span>
+                        <span>{{ cost_summary.services_cost }} руб.</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-money-bill-wave"></i> Итого к оплате:</span>
+                        <span class="fw-bold">{{ cost_summary.total_cost }} руб.</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-check-circle"></i> Оплачено услуг:</span>
+                        <span class="text-success">{{ cost_summary.services_paid }} руб.</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-exclamation-circle"></i> Остаток к оплате:</span>
+                        <span class="fw-bold {% if cost_summary.balance_due > 0 %}text-danger{% else %}text-success{% endif %}">
+                            {{ cost_summary.balance_due }} руб.
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Список номеров -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Забронированные номера</h5>
+            </div>
+            <div class="card-body">
+                {% if booking.rooms and booking.rooms|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Отель</th>
+                                    <th>Номер</th>
+                                    <th>Этаж</th>
+                                    <th>Вместимость</th>
+                                    <th>Цена/день</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for room in booking.rooms %}
+                                <tr>
+                                    <td>{{ room.hotel_name }}</td>
+                                    <td>{{ room.room_number }}</td>
+                                    <td>{{ room.floor_number }}</td>
+                                    <td>{{ room.room_capacity }}</td>
+                                    <td>{{ room.base_rate }} руб.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="{{ url_for('booking.rooms', booking_id=booking.id) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-hotel"></i> Управление номерами
+                    </a>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Нет забронированных номеров
+                    </div>
+                    <a href="{{ url_for('booking.rooms', booking_id=booking.id) }}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus"></i> Добавить номера
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Список услуг -->
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Дополнительные услуги</h5>
+            </div>
+            <div class="card-body">
+                {% if booking.services and booking.services|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Услуга</th>
+                                    <th>Дата</th>
+                                    <th>Стоимость</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for service in booking.services %}
+                                <tr>
+                                    <td>{{ service.service_name }}</td>
+                                    <td>{{ service.usage_date.strftime('%d.%m.%Y') }}</td>
+                                    <td>{{ service.cost }} руб.</td>
+                                    <td>
+                                        {% if service.paid %}
+                                            <span class="badge bg-success">Оплачено</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Не оплачено</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="{{ url_for('booking.services', booking_id=booking.id) }}" class="btn btn-sm btn-success">
+                        <i class="fas fa-concierge-bell"></i> Управление услугами
+                    </a>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Нет дополнительных услуг
+                    </div>
+                    <a href="{{ url_for('booking.services', booking_id=booking.id) }}" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus"></i> Добавить услуги
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для подтверждения удаления -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить бронирование #{{ booking.id }}?</p>
+                <p class="text-danger">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Внимание! Это действие нельзя будет отменить. Все связанные услуги также будут удалены.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <form action="{{ url_for('booking.delete', booking_id=booking.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

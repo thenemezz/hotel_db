@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Статистика по жалобам — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Статистика по жалобам{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-filter"></i> Фильтры</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" action="{{ url_for('complaint.stats') }}" class="row g-3">
+            <div class="col-md-4">
+                <label for="start_date" class="form-label">Начальная дата</label>
+                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date or '' }}">
+            </div>
+            <div class="col-md-4">
+                <label for="end_date" class="form-label">Конечная дата</label>
+                <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date or '' }}">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="fas fa-filter"></i> Применить фильтры
+                </button>
+                <a href="{{ url_for('complaint.stats') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Сбросить
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Общая статистика</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.general_stats %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="stat-card bg-light p-3 rounded text-center">
+                            <h3 class="text-primary mb-0">{{ stats.general_stats.total_complaints }}</h3>
+                            <p class="mb-0 text-muted">Всего жалоб</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stat-card bg-light p-3 rounded text-center">
+                            <h3 class="text-success mb-0">{{ stats.general_stats.resolved_complaints }}</h3>
+                            <p class="mb-0 text-muted">Разрешенные</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stat-card bg-light p-3 rounded text-center">
+                            <h3 class="text-danger mb-0">{{ stats.general_stats.unresolved_complaints }}</h3>
+                            <p class="mb-0 text-muted">Неразрешенные</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="stat-card bg-light p-3 rounded text-center">
+                            <h3 class="text-info mb-0">{{ stats.general_stats.unique_complainants }}</h3>
+                            <p class="mb-0 text-muted">Уникальных гостей</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <h6>Среднее время разрешения:</h6>
+                    <div class="progress" style="height: 30px;">
+                        {% set avg_days = stats.general_stats.avg_resolution_days|float %}
+                        {% if avg_days > 0 %}
+                            {% set days_class = 'bg-success' if avg_days <= 3 else ('bg-warning' if avg_days <= 7 else 'bg-danger') %}
+                            <div class="progress-bar {{ days_class }}" role="progressbar" style="width: {{ min(100, avg_days * 10) }}%"
+                                 aria-valuenow="{{ avg_days }}" aria-valuemin="0" aria-valuemax="10">
+                                {{ avg_days|round(1) }} дней
+                            </div>
+                        {% else %}
+                            <div class="progress-bar bg-secondary" role="progressbar" style="width: 100%">
+                                Нет данных
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Нет данных для отображения статистики.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Жалобы по месяцам</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.monthly_stats %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Период</th>
+                                <th>Всего жалоб</th>
+                                <th>Разрешено</th>
+                                <th>% разрешения</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for month in stats.monthly_stats %}
+                            <tr>
+                                <td>{{ month.month|int }}.{{ month.year|int }}</td>
+                                <td>{{ month.complaints_count }}</td>
+                                <td>{{ month.resolved_count }}</td>
+                                <td>
+                                    {% set resolve_percent = (month.resolved_count / month.complaints_count * 100)|round(1) %}
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar {{ 'bg-success' if resolve_percent >= 75 else ('bg-warning' if resolve_percent >= 50 else 'bg-danger') }}" 
+                                             role="progressbar" style="width: {{ resolve_percent }}%" 
+                                             aria-valuenow="{{ resolve_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                            {{ resolve_percent }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Нет данных для отображения статистики по месяцам.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

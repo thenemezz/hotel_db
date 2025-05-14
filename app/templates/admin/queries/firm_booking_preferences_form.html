@@ -1,0 +1,51 @@
+<!-- firm_booking_preferences_form.html -->
+{% extends 'base.html' %}
+
+{% block title %}Предпочтения бронирования фирм — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Предпочтения бронирования фирм{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Запрос 7: Предпочтения бронирования фирм</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('admin_queries.firm_booking_preferences') }}">
+                    <div class="mb-3">
+                        <label for="firm_id" class="form-label">Выберите фирму</label>
+                        <select class="form-select" id="firm_id" name="firm_id" required>
+                            <option value="">Выберите фирму...</option>
+                            {% for firm in firms %}
+                            <option value="{{ firm.id }}">{{ firm.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">Дата начала периода (необязательно)</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">Дата окончания периода (необязательно)</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin_queries.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Назад к списку запросов
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Выполнить запрос
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

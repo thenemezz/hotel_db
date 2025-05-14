@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование отеля — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Редактирование отеля «{{ hotel.name }}»{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <a href="{{ url_for('hotel.show', hotel_id=hotel.id) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к отелю
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form action="{{ url_for('hotel.edit', hotel_id=hotel.id) }}" method="post">
+            <div class="row">
+                <!-- Левая колонка - основная информация -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Основная информация</h5>
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Название отеля <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ hotel.name }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Рейтинг (звезды) <span class="text-danger">*</span></label>
+                        <select class="form-select" id="rating" name="rating" required>
+                            <option value="1" {% if hotel.rating == 1 %}selected{% endif %}>1 звезда</option>
+                            <option value="2" {% if hotel.rating == 2 %}selected{% endif %}>2 звезды</option>
+                            <option value="3" {% if hotel.rating == 3 %}selected{% endif %}>3 звезды</option>
+                            <option value="4" {% if hotel.rating == 4 %}selected{% endif %}>4 звезды</option>
+                            <option value="5" {% if hotel.rating == 5 %}selected{% endif %}>5 звезд</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="floors" class="form-label">Количество этажей <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="floors" name="floors" min="1" value="{{ hotel.floors }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="room_count" class="form-label">Общее количество номеров <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="room_count" name="room_count" min="0" value="{{ hotel.room_count }}" required>
+                    </div>
+                </div>
+                
+                <!-- Правая колонка - услуги -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Доступные услуги</h5>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_housekeeping" name="has_housekeeping" 
+                                  {% if hotel.has_housekeeping %}checked{% endif %}>
+                            <label class="form-check-label" for="has_housekeeping">
+                                <i class="fas fa-broom"></i> Ежедневная уборка номера
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_laundry" name="has_laundry"
+                                  {% if hotel.has_laundry %}checked{% endif %}>
+                            <label class="form-check-label" for="has_laundry">
+                                <i class="fas fa-tshirt"></i> Прачечная
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_dry_cleaning" name="has_dry_cleaning"
+                                  {% if hotel.has_dry_cleaning %}checked{% endif %}>
+                            <label class="form-check-label" for="has_dry_cleaning">
+                                <i class="fas fa-spray-can"></i> Химчистка
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_restaurant" name="has_restaurant"
+                                  {% if hotel.has_restaurant %}checked{% endif %}>
+                            <label class="form-check-label" for="has_restaurant">
+                                <i class="fas fa-utensils"></i> Ресторан
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_bar" name="has_bar"
+                                  {% if hotel.has_bar %}checked{% endif %}>
+                            <label class="form-check-label" for="has_bar">
+                                <i class="fas fa-glass-martini-alt"></i> Бар
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_pool_sauna" name="has_pool_sauna"
+                                  {% if hotel.has_pool_sauna %}checked{% endif %}>
+                            <label class="form-check-label" for="has_pool_sauna">
+                                <i class="fas fa-swimming-pool"></i> Бассейн/Сауна
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_billiards" name="has_billiards"
+                                  {% if hotel.has_billiards %}checked{% endif %}>
+                            <label class="form-check-label" for="has_billiards">
+                                <i class="fas fa-dice"></i> Бильярд
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Сохранить изменения
+                </button>
+                <a href="{{ url_for('hotel.show', hotel_id=hotel.id) }}" class="btn btn-outline-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Разрешение жалобы — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Разрешение жалобы{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-check-circle"></i> Разрешение жалобы</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5>Информация о жалобе:</h5>
+                    <div class="p-3 bg-light rounded mb-3">
+                        <div class="row mb-2">
+                            <div class="col-md-4 fw-bold">Дата:</div>
+                            <div class="col-md-8">{{ complaint.complaint_date.strftime('%d.%m.%Y') }}</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-4 fw-bold">Гость:</div>
+                            <div class="col-md-8">{{ complaint.last_name }} {{ complaint.first_name }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="fw-bold mb-2">Содержание жалобы:</div>
+                                {{ complaint.description|nl2br }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="post" action="{{ url_for('complaint.resolve', complaint_id=complaint.id) }}">
+                    <div class="mb-3">
+                        <label for="resolution_details" class="form-label">Детали разрешения *</label>
+                        <textarea class="form-control" id="resolution_details" name="resolution_details" rows="5" required></textarea>
+                        <div class="form-text">Укажите, каким образом была разрешена жалоба. Минимум 10 символов.</div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('complaint.show', complaint_id=complaint.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i> Разрешить жалобу
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

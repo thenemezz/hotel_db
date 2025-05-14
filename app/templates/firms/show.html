@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}Фирма {{ firm.name }} — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Информация о фирме{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-building"></i> {{ firm.name }}</h5>
+                <div>
+                    <a href="{{ url_for('firm.edit', firm_id=firm.id) }}" class="btn btn-sm btn-light me-1">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </a>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteFirmModal">
+                        <i class="fas fa-trash"></i> Удалить
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">ID:</div>
+                    <div class="col-md-8">{{ firm.id }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Название:</div>
+                    <div class="col-md-8">{{ firm.name }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Тип фирмы:</div>
+                    <div class="col-md-8">{{ firm.firm_type or 'Не указан' }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Адрес:</div>
+                    <div class="col-md-8">{{ firm.address or 'Не указан' }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Телефон:</div>
+                    <div class="col-md-8">{{ firm.phone or 'Не указан' }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Статус:</div>
+                    <div class="col-md-8">
+                        {% if firm.is_active %}
+                        <span class="badge bg-success">Активна</span>
+                        {% else %}
+                        <span class="badge bg-danger">Неактивна</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('firm.contracts', firm_id=firm.id) }}" class="btn btn-primary">
+                    <i class="fas fa-file-contract"></i> Управление контрактами
+                </a>
+                <a href="{{ url_for('firm.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к списку
+                </a>
+            </div>
+        </div>
+        
+        <!-- Модальное окно подтверждения удаления -->
+        <div class="modal fade" id="deleteFirmModal" tabindex="-1" aria-labelledby="deleteFirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteFirmModalLabel">Подтвердите удаление</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Вы действительно хотите удалить фирму "{{ firm.name }}"?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <form action="{{ url_for('firm.delete', firm_id=firm.id) }}" method="post">
+                            <button type="submit" class="btn btn-danger">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Статистика бронирования</h5>
+            </div>
+            <div class="card-body">
+                {% if booking_preferences.bookings_summary %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="stat-card bg-light p-3 mb-3 rounded text-center">
+                            <h3 class="text-primary mb-0">{{ booking_preferences.bookings_summary.bookings_count }}</h3>
+                            <p class="mb-0 text-muted">Всего бронирований</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-card bg-light p-3 mb-3 rounded text-center">
+                            <h3 class="text-success mb-0">{{ booking_preferences.bookings_summary.total_rooms }}</h3>
+                            <p class="mb-0 text-muted">Забронировано номеров</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-card bg-light p-3 mb-3 rounded text-center">
+                            <h3 class="text-info mb-0">{{ booking_preferences.bookings_summary.total_persons }}</h3>
+                            <p class="mb-0 text-muted">Всего гостей</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-card bg-light p-3 mb-3 rounded text-center">
+                            <h3 class="text-warning mb-0">{{ booking_preferences.bookings_summary.avg_stay_duration|round(1) }}</h3>
+                            <p class="mb-0 text-muted">Средняя продолжительность (дней)</p>
+                        </div>
+                    </div>
+                </div>
+
+                {% if booking_preferences.preferred_hotels %}
+                <h6 class="mb-3">Предпочитаемые отели:</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Отель</th>
+                                <th>Рейтинг</th>
+                                <th>Кол-во бронирований</th>
+                                <th>Кол-во номеров</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hotel in booking_preferences.preferred_hotels %}
+                            <tr>
+                                <td>{{ hotel.name }}</td>
+                                <td>
+                                    {% for i in range(hotel.rating) %}
+                                    <i class="fas fa-star text-warning"></i>
+                                    {% endfor %}
+                                </td>
+                                <td>{{ hotel.bookings_count }}</td>
+                                <td>{{ hotel.total_rooms }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+
+                {% if booking_preferences.preferred_room_types %}
+                <h6 class="mb-3 mt-4">Предпочитаемые типы номеров:</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Вместимость</th>
+                                <th>Кол-во номеров</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for room_type in booking_preferences.preferred_room_types %}
+                            <tr>
+                                <td>{{ room_type.room_capacity }}-местный</td>
+                                <td>{{ room_type.rooms_count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Статистика бронирования недоступна. У фирмы нет бронирований.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-file-contract"></i> Действующие контракты</h5>
+            </div>
+            <div class="card-body">
+                {% if contracts %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Период действия</th>
+                                <th>Скидка</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contract in contracts %}
+                            <tr>
+                                <td>{{ contract.id }}</td>
+                                <td>{{ contract.contract_start_date.strftime('%d.%m.%Y') }} - {{ contract.contract_end_date.strftime('%d.%m.%Y') }}</td>
+                                <td>{{ contract.discount_rate }}%</td>
+                                <td>
+                                    {% set today = now().date() %}
+                                    {% if today >= contract.contract_start_date and today <= contract.contract_end_date %}
+                                        <span class="badge bg-success">Действующий</span>
+                                    {% elif today < contract.contract_start_date %}
+                                        <span class="badge bg-warning">Будущий</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Завершен</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> У данной фирмы нет контрактов.
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('firm.contracts', firm_id=firm.id) }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Добавить контракт
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавление услуги — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Добавление новой услуги{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-concierge-bell"></i> Данные услуги</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('service.create') }}">
+                    <div class="mb-3">
+                        <label for="guest_id" class="form-label">Гость *</label>
+                        <select class="form-select" id="guest_id" name="guest_id" required>
+                            <option value="">Выберите гостя</option>
+                            {% for guest in guests %}
+                            <option value="{{ guest.id }}" {% if request.args.get('guest_id')|int == guest.id %}selected{% endif %}>
+                                {{ guest.last_name }} {{ guest.first_name }} {{ guest.middle_name or '' }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="service_type_id" class="form-label">Тип услуги *</label>
+                        <select class="form-select" id="service_type_id" name="service_type_id" required onchange="updateCost()">
+                            <option value="">Выберите тип услуги</option>
+                            {% for service_type in service_types %}
+                            <option value="{{ service_type.id }}" data-price="{{ service_type.base_price }}">
+                                {{ service_type.name }} ({{ service_type.base_price }} ₽)
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cost" class="form-label">Стоимость (₽) *</label>
+                        <input type="number" class="form-control" id="cost" name="cost" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="usage_date" class="form-label">Дата оказания услуги</label>
+                        <input type="date" class="form-control" id="usage_date" name="usage_date">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="booking_id" class="form-label">ID бронирования</label>
+                        <input type="number" class="form-control" id="booking_id" name="booking_id">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="room_id" class="form-label">ID номера</label>
+                        <input type="number" class="form-control" id="room_id" name="room_id">
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="paid" name="paid">
+                        <label class="form-check-label" for="paid">Оплачено</label>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('service.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Сохранить
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function updateCost() {
+        const serviceTypeSelect = document.getElementById('service_type_id');
+        const costInput = document.getElementById('cost');
+        const selectedOption = serviceTypeSelect.options[serviceTypeSelect.selectedIndex];
+        
+        if (selectedOption.value) {
+            costInput.value = selectedOption.dataset.price;
+        } else {
+            costInput.value = '';
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Устанавливаем текущую дату
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        document.getElementById('usage_date').value = `${year}-${month}-${day}`;
+        
+        // Инициализируем стоимость при загрузке
+        updateCost();
+    });
+</script>
+{% endblock %}

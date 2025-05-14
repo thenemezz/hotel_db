@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Жалоба № {{ complaint.id }} — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Информация о жалобе{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Жалоба № {{ complaint.id }}</h5>
+                <div>
+                    <a href="{{ url_for('complaint.edit', complaint_id=complaint.id) }}" class="btn btn-sm btn-light me-1">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </a>
+                    {% if not complaint.resolved %}
+                    <a href="{{ url_for('complaint.resolve', complaint_id=complaint.id) }}" class="btn btn-sm btn-success me-1">
+                        <i class="fas fa-check"></i> Разрешить
+                    </a>
+                    {% endif %}
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteComplaintModal">
+                        <i class="fas fa-trash"></i> Удалить
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Статус:</div>
+                    <div class="col-md-8">
+                        {% if complaint.resolved %}
+                        <span class="badge bg-success">Разрешено</span>
+                        {% else %}
+                        <span class="badge bg-danger">Не разрешено</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Дата жалобы:</div>
+                    <div class="col-md-8">{{ complaint.complaint_date.strftime('%d.%m.%Y') }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Гость:</div>
+                    <div class="col-md-8">
+                        {{ complaint.last_name }} {{ complaint.first_name }} {{ complaint.middle_name or '' }}
+                        <a href="{{ url_for('guest.show', guest_id=complaint.guest_id) }}" class="btn btn-sm btn-outline-primary ms-2">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Контакты:</div>
+                    <div class="col-md-8">
+                        {% if complaint.guest_phone %}Телефон: {{ complaint.guest_phone }}<br>{% endif %}
+                        {% if complaint.guest_email %}Email: {{ complaint.guest_email }}{% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h5 class="mb-3">Содержание жалобы:</h5>
+                    <div class="p-3 bg-light rounded">
+                        {{ complaint.description|nl2br }}
+                    </div>
+                </div>
+                
+                {% if complaint.resolved %}
+                <div class="mb-3">
+                    <h5 class="mb-3">Решение:</h5>
+                    <div class="p-3 bg-light rounded">
+                        <div class="row mb-2">
+                            <div class="col-md-4 fw-bold">Дата разрешения:</div>
+                            <div class="col-md-8">{{ complaint.resolution_date.strftime('%d.%m.%Y') }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="fw-bold mb-2">Детали разрешения:</div>
+                                {{ complaint.resolution_details|nl2br }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('complaint.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к списку
+                </a>
+            </div>
+        </div>
+        
+        <!-- Модальное окно подтверждения удаления -->
+        <div class="modal fade" id="deleteComplaintModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Подтвердите удаление</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Вы действительно хотите удалить эту жалобу?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <form action="{{ url_for('complaint.delete', complaint_id=complaint.id) }}" method="post">
+                            <button type="submit" class="btn btn-danger">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

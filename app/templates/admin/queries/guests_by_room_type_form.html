@@ -1,0 +1,57 @@
+<!-- guests_by_room_type_form.html -->
+{% extends 'base.html' %}
+
+{% block title %}Постояльцы по типу номеров — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Постояльцы по типу номеров{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-users"></i> Запрос 2: Постояльцы по характеристикам номеров</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('admin_queries.guests_by_room_type') }}">
+                    <div class="mb-3">
+                        <label for="room_capacity" class="form-label">Минимальная вместимость номера</label>
+                        <input type="number" class="form-control" id="room_capacity" name="room_capacity" value="2" min="1">
+                        <div class="form-text">Оставьте пустым, чтобы не учитывать этот параметр</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="hotel_rating" class="form-label">Минимальный рейтинг отеля (звезд)</label>
+                        <select class="form-select" id="hotel_rating" name="hotel_rating">
+                            <option value="">Любой рейтинг</option>
+                            <option value="3">3 звезды и выше</option>
+                            <option value="4">4 звезды и выше</option>
+                            <option value="5">5 звезд</option>
+                        </select>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">Дата начала периода (необязательно)</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">Дата окончания периода (необязательно)</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin_queries.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Назад к списку запросов
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Выполнить запрос
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

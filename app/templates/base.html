@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Гостиничный комплекс{% endblock %}</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">
+        <i class="fas fa-hotel me-2"></i> Гостиничный комплекс
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('main.index') }}">
+              <i class="fas fa-home me-1"></i> Главная
+            </a>
+          </li>
+          {% if current_user.is_authenticated and current_user.has_access('hotel','read') %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('hotel.index') }}">
+              <i class="fas fa-building me-1"></i> Отели
+            </a>
+          </li>
+          {% endif %}
+
+          {% if current_user.is_authenticated and current_user.has_access('room','read') %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('room.index') }}">
+              <i class="fas fa-door-open me-1"></i> Номера
+            </a>
+          </li>
+          {% endif %}
+
+          {% if current_user.is_authenticated and current_user.has_access('booking','read') %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('booking.index') }}">
+              <i class="fas fa-calendar-alt me-1"></i> Бронирования
+            </a>
+          </li>
+          {% endif %}
+
+          {% if current_user.is_authenticated and current_user.has_access('guest','read') %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('guest.index') }}">
+              <i class="fas fa-user-friends me-1"></i> Гости
+            </a>
+          </li>
+          {% endif %}
+
+          {% if current_user.is_authenticated and current_user.has_access('firm','read') %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('firm.index') }}">
+              <i class="fas fa-briefcase me-1"></i> Фирмы
+            </a>
+          </li>
+          {% endif %}
+
+          {% if current_user.is_authenticated and (current_user.has_access('servicetype','read') or current_user.has_access('serviceusage','read')) %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('service.index') }}">
+              <i class="fas fa-concierge-bell me-1"></i> Услуги
+            </a>
+          </li>
+          {% endif %}
+
+          {% if current_user.is_authenticated and current_user.has_access('complaint','read') %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('complaint.index') }}">
+              <i class="fas fa-exclamation-circle me-1"></i> Жалобы
+            </a>
+          </li>
+          {% endif %}
+
+          {% if current_user.is_authenticated and current_user.role == 'admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('admin_queries.index') }}">
+              <i class="fas fa-database me-1"></i> Запросы
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+
+        <ul class="navbar-nav">
+          {% if current_user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-user me-1"></i> {{ current_user.username }}
+              <span class="badge bg-light text-dark ms-1">{{ current_user.role }}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
+                <i class="fas fa-sign-out-alt me-1"></i> Выйти
+              </a></li>
+            </ul>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('auth.login') }}">
+              <i class="fas fa-sign-in-alt me-1"></i> Вход
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <h1 class="mb-4">{% block page_title %}{% endblock %}</h1>
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer mt-5 py-3 bg-light">
+    <div class="container text-center">
+      <span class="text-muted">© 2025 Гостиничный комплекс. Все права защищены.</span>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

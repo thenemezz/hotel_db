@@ -1,0 +1,115 @@
+<!-- room_without_guest.html -->
+{% extends 'base.html' %}
+
+{% block title %}Информация о номере — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Информация о номере{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-bed"></i> Сведения о номере {{ room_info.room_number }} ({{ room_info.hotel_name }})</h5>
+        <a href="{{ url_for('admin_queries.guest_details_by_room') }}" class="btn btn-sm btn-light">
+            <i class="fas fa-door-open"></i> Выбрать другой номер
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info">
+            <h5 class="mb-0"><i class="fas fa-info-circle"></i> В данном номере сейчас нет постояльцев</h5>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Информация о номере</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Отель
+                                <span>{{ room_info.hotel_name }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Номер
+                                <span>{{ room_info.room_number }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Этаж
+                                <span>{{ room_info.floor_number }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Вместимость
+                                <span>{{ room_info.room_capacity }} чел.</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Базовая ставка
+                                <span>{{ room_info.base_rate }} руб./сутки</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Статус
+                                {% if room_info.is_available %}
+                                <span class="badge bg-success">Доступен</span>
+                                {% else %}
+                                <span class="badge bg-danger">Недоступен</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Предыдущий постоялец</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if last_guest %}
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Имя гостя
+                                <span>
+                                    <a href="{{ url_for('admin_queries.guest_history', guest_id=last_guest.guest_id) }}">
+                                        {{ last_guest.guest_name }}
+                                    </a>
+                                </span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Период проживания
+                                <span>{{ last_guest.check_in_date }} — {{ last_guest.check_out_date }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Статус бронирования
+                                <span class="badge
+                                    {% if last_guest.status == 'Забронировано' %}bg-success
+                                    {% elif last_guest.status == 'Отменено' %}bg-danger
+                                    {% else %}bg-info{% endif %}">
+                                    {{ last_guest.status }}
+                                </span>
+                            </li>
+                        </ul>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            Информация о предыдущих постояльцах отсутствует.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ url_for('admin_queries.room_availability', room_id=room_id) }}" class="btn btn-primary">
+                <i class="fas fa-calendar-alt"></i> Проверить доступность
+            </a>
+            <a href="{{ url_for('admin_queries.room_occupancy_history', room_id=room_id) }}" class="btn btn-info">
+                <i class="fas fa-history"></i> История занятости
+            </a>
+            <a href="{{ url_for('admin_queries.index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Назад к списку запросов
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+<!-- guest_not_found.html -->
+{% extends 'base.html' %}
+
+{% block title %}Гость не найден — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Гость не найден{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"><i class="fas fa-exclamation-circle"></i> Ошибка: Гость не найден</h5>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger">
+            <p>Гость с ID {{ guest_id }} не найден в базе данных.</p>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ url_for('admin_queries.all_guests') }}" class="btn btn-primary">
+                <i class="fas fa-users"></i> Список всех гостей
+            </a>
+            <a href="{{ url_for('admin_queries.index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Назад к списку запросов
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

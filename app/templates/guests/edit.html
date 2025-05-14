@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование гостя — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Редактирование гостя{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user-edit"></i> Редактирование данных гостя</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('guest.edit', guest_id=guest.id) }}">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="last_name" class="form-label">Фамилия *</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ guest.last_name }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="first_name" class="form-label">Имя *</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ guest.first_name }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="middle_name" class="form-label">Отчество</label>
+                            <input type="text" class="form-control" id="middle_name" name="middle_name" value="{{ guest.middle_name or '' }}">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="passport_series" class="form-label">Серия паспорта</label>
+                            <input type="text" class="form-control" id="passport_series" name="passport_series" value="{{ guest.passport_series or '' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="passport_number" class="form-label">Номер паспорта</label>
+                            <input type="text" class="form-control" id="passport_number" name="passport_number" value="{{ guest.passport_number or '' }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Телефон</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" value="{{ guest.phone or '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ guest.email or '' }}">
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('guest.show', guest_id=guest.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Назад
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

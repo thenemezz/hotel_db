@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавление отеля — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Добавление нового отеля{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <a href="{{ url_for('hotel.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к списку
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form action="{{ url_for('hotel.create') }}" method="post">
+            <div class="row">
+                <!-- Левая колонка - основная информация -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Основная информация</h5>
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Название отеля <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Рейтинг (звезды) <span class="text-danger">*</span></label>
+                        <select class="form-select" id="rating" name="rating" required>
+                            <option value="1">1 звезда</option>
+                            <option value="2">2 звезды</option>
+                            <option value="3" selected>3 звезды</option>
+                            <option value="4">4 звезды</option>
+                            <option value="5">5 звезд</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="floors" class="form-label">Количество этажей <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="floors" name="floors" min="1" value="1" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="room_count" class="form-label">Общее количество номеров <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="room_count" name="room_count" min="0" value="0" required>
+                    </div>
+                </div>
+                
+                <!-- Правая колонка - услуги -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Доступные услуги</h5>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_housekeeping" name="has_housekeeping">
+                            <label class="form-check-label" for="has_housekeeping">
+                                <i class="fas fa-broom"></i> Ежедневная уборка номера
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_laundry" name="has_laundry">
+                            <label class="form-check-label" for="has_laundry">
+                                <i class="fas fa-tshirt"></i> Прачечная
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_dry_cleaning" name="has_dry_cleaning">
+                            <label class="form-check-label" for="has_dry_cleaning">
+                                <i class="fas fa-spray-can"></i> Химчистка
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_restaurant" name="has_restaurant">
+                            <label class="form-check-label" for="has_restaurant">
+                                <i class="fas fa-utensils"></i> Ресторан
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_bar" name="has_bar">
+                            <label class="form-check-label" for="has_bar">
+                                <i class="fas fa-glass-martini-alt"></i> Бар
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_pool_sauna" name="has_pool_sauna">
+                            <label class="form-check-label" for="has_pool_sauna">
+                                <i class="fas fa-swimming-pool"></i> Бассейн/Сауна
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="has_billiards" name="has_billiards">
+                            <label class="form-check-label" for="has_billiards">
+                                <i class="fas fa-dice"></i> Бильярд
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Сохранить
+                </button>
+                <a href="{{ url_for('hotel.index') }}" class="btn btn-outline-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}История занятости номера — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}История занятости номера{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-bed"></i> История занятости номера {{ room.room_number }} ({{ room.hotel_name }})</h5>
+        <a href="{{ url_for('admin_queries.room_occupancy_history_form', room_id=room.room_id) }}" class="btn btn-sm btn-light">
+            <i class="fas fa-filter"></i> Изменить период
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <div class="alert alert-info">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Информация о номере:</h5>
+                        <p><strong>Отель:</strong> {{ room.hotel_name }} ({{ room.hotel_stars }} &#9733;)</p>
+                        <p><strong>Номер комнаты:</strong> {{ room.room_number }}</p>
+                        <p><strong>Этаж:</strong> {{ room.floor_number }}</p>
+                        <p><strong>Вместимость:</strong> {{ room.room_capacity }} чел.</p>
+                        <p><strong>Цена за ночь:</strong> {{ room.base_rate }} руб.</p>
+                        <p><strong>Статус:</strong> {% if room.is_available %}<span class="badge bg-success">Доступен</span>{% else %}<span class="badge bg-danger">Недоступен</span>{% endif %}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Параметры запроса:</h5>
+                        <p><strong>Период:</strong> с {{ start_date }} по {{ end_date }}</p>
+                        <p><strong>Всего дней в периоде:</strong> {{ total_days }}</p>
+                        <p><strong>Дней занятости:</strong> {{ occupied_days }}</p>
+                        <p><strong>Процент загрузки:</strong> {{ occupancy_rate|round(2) }}%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">История бронирований номера</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if bookings %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Период</th>
+                                        <th>Гость</th>
+                                        <th>Продолжительность</th>
+                                        <th>Количество гостей</th>
+                                        <th>Тип бронирования</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in bookings %}
+                                    <tr>
+                                        <td>{{ booking.check_in_date }} — {{ booking.check_out_date }}</td>
+                                        <td>
+                                            {% if booking.guest_id %}
+                                            <a href="{{ url_for('admin_queries.guest_history', guest_id=booking.guest_id) }}">
+                                                {{ booking.guest_name }}
+                                            </a>
+                                            {% else %}
+                                            <span class="text-muted">Нет данных</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ booking.stay_length }} дней</td>
+                                        <td>{{ booking.total_persons }}</td>
+                                        <td>{{ booking.booking_type }}</td>
+                                        <td>
+                                            <span class="badge {% if booking.status == 'Забронировано' %}bg-success{% elif booking.status == 'Отменено' %}bg-danger{% else %}bg-info{% endif %}">
+                                                {{ booking.status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Нет истории бронирований за указанный период.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Статистика и доходы</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Загрузка номера
+                                <div class="progress" style="width: 60%;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ occupancy_rate }}%;" aria-valuenow="{{ occupancy_rate }}" aria-valuemin="0" aria-valuemax="100">{{ occupancy_rate|round(2) }}%</div>
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Доход от номера
+                                <span class="badge bg-primary">{{ room_revenue }} руб.</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Доход от услуг
+                                <span class="badge bg-info">{{ service_revenue }} руб.</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Общий доход
+                                <span class="badge bg-success">{{ total_revenue }} руб.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                {% if services %}
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Дополнительные услуги</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Услуга</th>
+                                        <th>Дата</th>
+                                        <th>Гость</th>
+                                        <th>Стоимость</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for service in services %}
+                                    <tr>
+                                        <td>{{ service.service_name }}</td>
+                                        <td>{{ service.usage_date }}</td>
+                                        <td>{{ service.guest_name }}</td>
+                                        <td>{{ service.cost }} руб.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ url_for('admin_queries.index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Назад к списку запросов
+            </a>
+            <a href="{{ url_for('admin_queries.all_rooms') }}" class="btn btn-primary">
+                <i class="fas fa-list"></i> Все номера
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

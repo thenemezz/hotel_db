@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование жалобы — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Редактирование жалобы{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-edit"></i> Редактирование данных жалобы</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('complaint.edit', complaint_id=complaint.id) }}">
+                    <div class="mb-3">
+                        <label for="guest_id" class="form-label">Гость *</label>
+                        <select class="form-select" id="guest_id" name="guest_id" required>
+                            <option value="">Выберите гостя</option>
+                            {% for guest in guests %}
+                            <option value="{{ guest.id }}" {% if guest.id == complaint.guest_id %}selected{% endif %}>
+                                {{ guest.last_name }} {{ guest.first_name }} {{ guest.middle_name or '' }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="complaint_date" class="form-label">Дата жалобы</label>
+                        <input type="date" class="form-control" id="complaint_date" name="complaint_date" 
+                               value="{{ complaint.complaint_date.strftime('%Y-%m-%d') }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Содержание жалобы *</label>
+                        <textarea class="form-control" id="description" name="description" rows="5" required>{{ complaint.description }}</textarea>
+                        <div class="form-text">Минимум 10 символов</div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="resolved" name="resolved" 
+                               {% if complaint.resolved %}checked{% endif %}>
+                        <label class="form-check-label" for="resolved">Жалоба разрешена</label>
+                    </div>
+                    
+                    <div id="resolution-fields" style="display: {{ 'block' if complaint.resolved else 'none' }};">
+                        <div class="mb-3">
+                            <label for="resolution_date" class="form-label">Дата разрешения</label>
+                            <input type="date" class="form-control" id="resolution_date" name="resolution_date" 
+                                   value="{{ complaint.resolution_date.strftime('%Y-%m-%d') if complaint.resolution_date else '' }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="resolution_details" class="form-label">Детали разрешения</label>
+                            <textarea class="form-control" id="resolution_details" name="resolution_details" rows="3">{{ complaint.resolution_details or '' }}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('complaint.show', complaint_id=complaint.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Отмена
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Сохранить
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Показываем поля разрешения при переключении чекбокса
+        const resolvedCheckbox = document.getElementById('resolved');
+        const resolutionFields = document.getElementById('resolution-fields');
+        
+        resolvedCheckbox.addEventListener('change', function() {
+            resolutionFields.style.display = this.checked ? 'block' : 'none';
+            
+            if (this.checked && !document.getElementById('resolution_date').value) {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                document.getElementById('resolution_date').value = `${year}-${month}-${day}`;
+            }
+        });
+    });
+</script>
+{% endblock %}

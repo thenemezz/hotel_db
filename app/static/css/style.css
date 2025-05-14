@@ -1,0 +1,186 @@
+/* Основные стили для гостиничного комплекса */
+
+/* Общие стили */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Верхняя навигация */
+.navbar-dark.bg-primary {
+    background-color: #1a3a85 !important;
+}
+
+.navbar-brand i {
+    margin-right: 8px;
+}
+
+/* Основное содержимое */
+.container.mt-4 {
+    min-height: calc(100vh - 200px);
+}
+
+/* Заголовки страниц */
+h1.mb-4 {
+    color: #1a3a85;
+    font-weight: 500;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+/* Карточки */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    border: none;
+}
+
+.card-header {
+    border-radius: 8px 8px 0 0 !important;
+    font-weight: 500;
+}
+
+.card-header.bg-primary {
+    background-color: #1a3a85 !important;
+}
+
+.card-header.bg-success {
+    background-color: #28a745 !important;
+}
+
+.card-header.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.card-header.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529;
+}
+
+.card-header.bg-info {
+    background-color: #17a2b8 !important;
+}
+
+/* Статистические карточки */
+.stat-card {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h3 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* Таблицы */
+.table {
+    background-color: white;
+}
+
+.table thead th {
+    background-color: #f1f3f5;
+    color: #495057;
+    border-top: none;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(26, 58, 133, 0.05);
+}
+
+/* Кнопки */
+.btn-primary {
+    background-color: #1a3a85;
+    border-color: #1a3a85;
+}
+
+.btn-primary:hover {
+    background-color: #142c63;
+    border-color: #142c63;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #218838;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
+.btn-outline-primary {
+    color: #1a3a85;
+    border-color: #1a3a85;
+}
+
+.btn-outline-primary:hover {
+    background-color: #1a3a85;
+    border-color: #1a3a85;
+}
+
+/* Формы */
+.form-control:focus {
+    border-color: #1a3a85;
+    box-shadow: 0 0 0 0.2rem rgba(26, 58, 133, 0.25);
+}
+
+/* Звёзды рейтинга отелей */
+.text-warning {
+    color: #ffb700 !important;
+}
+
+/* Footer */
+.footer {
+    background-color: #f1f3f5 !important;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+    .stat-card h3 {
+        font-size: 1.5rem;
+    }
+
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Стили печати */
+@media print {
+    .navbar, .footer, .btn, .no-print {
+        display: none !important;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .card-header {
+        background-color: white !important;
+        color: black !important;
+    }
+}

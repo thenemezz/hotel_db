@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Номер {{ room.room_number }} — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Номер {{ room.room_number }} ({{ room.hotel_name }}){% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <a href="{{ url_for('room.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к списку
+        </a>
+        <a href="{{ url_for('hotel.show', hotel_id=room.hotel_id) }}" class="btn btn-info">
+            <i class="fas fa-hotel"></i> К отелю
+        </a>
+        <a href="{{ url_for('room.edit', room_id=room.id) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Редактировать
+        </a>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="fas fa-trash"></i> Удалить
+        </button>
+    </div>
+</div>
+
+<!-- Информация о номере -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Информация о номере</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-id-card"></i> ID номера:</span>
+                        <span class="badge bg-primary rounded-pill">{{ room.id }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-hotel"></i> Отель:</span>
+                        <span>{{ room.hotel_name }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-door-closed"></i> Номер комнаты:</span>
+                        <span>{{ room.room_number }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-building"></i> Этаж:</span>
+                        <span>{{ room.floor_number }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-users"></i> Вместимость:</span>
+                        <span>{{ room.room_capacity }} чел.</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-ruble-sign"></i> Базовая цена в день:</span>
+                        <span>{{ room.base_rate }} руб.</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-check-circle"></i> Статус:</span>
+                        <span>
+                            {% if room.is_available %}
+                                <span class="badge bg-success">Свободен</span>
+                            {% else %}
+                                <span class="badge bg-danger">Занят</span>
+                            {% endif %}
+                        </span>
+                    </li>
+                </ul>
+                
+                {% if room.is_available %}
+                    <a href="{{ url_for('booking.create') }}?room_id={{ room.id }}" class="btn btn-success">
+                        <i class="fas fa-calendar-plus"></i> Забронировать
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <!-- Текущие и будущие бронирования -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">Бронирования</h5>
+            </div>
+            <div class="card-body">
+                {% if room.bookings and room.bookings|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Даты</th>
+                                    <th>Клиент</th>
+                                    <th>Статус</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in room.bookings %}
+                                <tr>
+                                    <td>{{ booking.id }}</td>
+                                    <td>
+                                        {{ booking.check_in_date.strftime('%d.%m.%Y') }} -<br>
+                                        {{ booking.check_out_date.strftime('%d.%m.%Y') }}
+                                    </td>
+                                    <td>{{ booking.booked_by }}</td>
+                                    <td><span class="badge bg-primary">{{ booking.status }}</span></td>
+                                    <td>
+                                        <a href="{{ url_for('booking.show', booking_id=booking.id) }}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        У этого номера пока нет активных бронирований
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для подтверждения удаления -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить номер {{ room.room_number }} ({{ room.hotel_name }})?</p>
+                {% if room.bookings and room.bookings|length > 0 %}
+                <p class="text-danger">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Внимание! У этого номера есть активные бронирования.
+                </p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <form action="{{ url_for('room.delete', room_id=room.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

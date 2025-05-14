@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Новое бронирование — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Создание нового бронирования{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <a href="{{ url_for('booking.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к списку
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form action="{{ url_for('booking.create') }}" method="post">
+            <!-- Выбор типа бронирования -->
+            <div class="mb-4">
+                <h5>Тип бронирования</h5>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="booking_type" id="booking_type_guest" value="guest" checked>
+                    <label class="form-check-label" for="booking_type_guest">От физического лица</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="booking_type" id="booking_type_firm" value="firm">
+                    <label class="form-check-label" for="booking_type_firm">От организации</label>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Информация о клиенте -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Информация о клиенте</h5>
+                    
+                    <!-- Выбор гостя (для физического лица) -->
+                    <div class="mb-3 guest-select">
+                        <label for="guest_id" class="form-label">Гость <span class="text-danger">*</span></label>
+                        <select class="form-select" id="guest_id" name="guest_id">
+                            <option value="">Выберите гостя</option>
+                            {% for guest in guests %}
+                                <option value="{{ guest.id }}">
+                                    {{ guest.last_name }} {{ guest.first_name }} {{ guest.middle_name or '' }} 
+                                    {% if guest.phone %} ({{ guest.phone }}){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            <a href="{{ url_for('guest.create') }}" target="_blank">
+                                <i class="fas fa-plus-circle"></i> Добавить нового гостя
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Выбор фирмы (для организации) -->
+                    <div class="mb-3 firm-select" style="display: none;">
+                        <label for="firm_id" class="form-label">Организация <span class="text-danger">*</span></label>
+                        <select class="form-select" id="firm_id" name="firm_id">
+                            <option value="">Выберите организацию</option>
+                            {% for firm in firms %}
+                                <option value="{{ firm.id }}">
+                                    {{ firm.name }} 
+                                    {% if firm.phone %} ({{ firm.phone }}){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            <a href="{{ url_for('firm.create') }}" target="_blank">
+                                <i class="fas fa-plus-circle"></i> Добавить новую организацию
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Информация о бронировании -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Информация о бронировании</h5>
+                    
+                    <div class="mb-3">
+                        <label for="check_in_date" class="form-label">Дата заезда <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="check_in_date" name="check_in_date" 
+                              value="{{ request.args.get('check_in_date', '') }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="check_out_date" class="form-label">Дата выезда <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="check_out_date" name="check_out_date" 
+                              value="{{ request.args.get('check_out_date', '') }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="total_rooms" class="form-label">Количество номеров <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="total_rooms" name="total_rooms" min="1" value="1" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="total_persons" class="form-label">Количество гостей <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="total_persons" name="total_persons" min="1" value="1" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Создать бронирование
+                </button>
+                <a href="{{ url_for('booking.index') }}" class="btn btn-outline-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Переключение между типами бронирования
+        const guestRadio = document.getElementById('booking_type_guest');
+        const firmRadio = document.getElementById('booking_type_firm');
+        const guestSelect = document.querySelector('.guest-select');
+        const firmSelect = document.querySelector('.firm-select');
+        
+        guestRadio.addEventListener('change', function() {
+            if (this.checked) {
+                guestSelect.style.display = 'block';
+                firmSelect.style.display = 'none';
+            }
+        });
+        
+        firmRadio.addEventListener('change', function() {
+            if (this.checked) {
+                guestSelect.style.display = 'none';
+                firmSelect.style.display = 'block';
+            }
+        });
+        
+        // Установка минимальной даты выезда
+        const checkInDate = document.getElementById('check_in_date');
+        const checkOutDate = document.getElementById('check_out_date');
+        
+        checkInDate.addEventListener('change', function() {
+            if (this.value) {
+                checkOutDate.min = this.value;
+                
+                // Если дата выезда раньше даты заезда, обновить дату выезда
+                if (checkOutDate.value < this.value) {
+                    checkOutDate.value = this.value;
+                }
+            }
+        });
+        
+        // Установка текущей даты, если даты не указаны
+        if (!checkInDate.value) {
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            checkInDate.value = formattedDate;
+            
+            // Завтрашняя дата для выезда
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            checkOutDate.value = tomorrow.toISOString().split('T')[0];
+            checkOutDate.min = checkInDate.value;
+        }
+    });
+</script>
+{% endblock %}

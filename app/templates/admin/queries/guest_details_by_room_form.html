@@ -1,0 +1,47 @@
+<!-- guest_details_by_room_form.html -->
+{% extends 'base.html' %}
+
+{% block title %}Сведения о постояльце из номера — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Сведения о постояльце из номера{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-user-check"></i> Запрос 10: Сведения о постояльце из номера</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('admin_queries.guest_details_by_room') }}">
+                    <div class="mb-3">
+                        <label for="room_id" class="form-label">Выберите номер</label>
+                        <select class="form-select" id="room_id" name="room_id" required>
+                            <option value="">Выберите номер...</option>
+                            {% for room in rooms %}
+                            <option value="{{ room.id }}">
+                                {{ room.room_description }}
+                                {% if room.currently_occupied %}
+                                &#x1F7E2; (Занят)
+                                {% else %}
+                                &#x1F534; (Свободен)
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin_queries.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Назад к списку запросов
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Выполнить запрос
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

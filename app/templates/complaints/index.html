@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Жалобы — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Список жалоб{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Все жалобы</h5>
+        <div>
+            <a href="{{ url_for('complaint.unresolved') }}" class="btn btn-sm btn-danger me-2">
+                <i class="fas fa-exclamation-circle"></i> Неразрешенные
+            </a>
+            <a href="{{ url_for('complaint.create') }}" class="btn btn-sm btn-light">
+                <i class="fas fa-plus"></i> Добавить жалобу
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Дата</th>
+                        <th>Гость</th>
+                        <th>Содержание</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                    <tr>
+                        <td>{{ complaint.id }}</td>
+                        <td>{{ complaint.complaint_date.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ complaint.guest_name }}</td>
+                        <td>{{ complaint.description|truncate(50) }}</td>
+                        <td>
+                            {% if complaint.resolved %}
+                            <span class="badge bg-success">Разрешено</span>
+                            {% else %}
+                            <span class="badge bg-danger">Не разрешено</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('complaint.show', complaint_id=complaint.id) }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-info-circle"></i>
+                                </a>
+                                <a href="{{ url_for('complaint.edit', complaint_id=complaint.id) }}" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if not complaint.resolved %}
+                                <a href="{{ url_for('complaint.resolve', complaint_id=complaint.id) }}" class="btn btn-sm btn-success">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                {% endif %}
+                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteComplaintModal{{ complaint.id }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+
+                            <!-- Модальное окно подтверждения удаления -->
+                            <div class="modal fade" id="deleteComplaintModal{{ complaint.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-danger text-white">
+                                            <h5 class="modal-title">Подтвердите удаление</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Вы действительно хотите удалить жалобу от {{ complaint.guest_name }}?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                            <form action="{{ url_for('complaint.delete', complaint_id=complaint.id) }}" method="post">
+                                                <button type="submit" class="btn btn-danger">Удалить</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

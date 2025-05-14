@@ -1,0 +1,80 @@
+<!-- available_rooms_by_characteristics_form.html -->
+{% extends 'base.html' %}
+
+{% block title %}Свободные номера по характеристикам — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Свободные номера по характеристикам{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-bed"></i> Запрос 4: Свободные номера по характеристикам</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('admin_queries.available_rooms_by_characteristics') }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="hotel_rating" class="form-label">Рейтинг отеля (звезд)</label>
+                            <select class="form-select" id="hotel_rating" name="hotel_rating">
+                                <option value="">Любой рейтинг</option>
+                                <option value="3">3 звезды</option>
+                                <option value="4">4 звезды</option>
+                                <option value="5">5 звезд</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="room_capacity" class="form-label">Минимальная вместимость номера</label>
+                            <input type="number" class="form-control" id="room_capacity" name="room_capacity" min="1">
+                            <div class="form-text">Оставьте пустым, чтобы не учитывать</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="floor_number" class="form-label">Этаж</label>
+                            <input type="number" class="form-control" id="floor_number" name="floor_number" min="1">
+                            <div class="form-text">Оставьте пустым, чтобы не учитывать</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="min_price" class="form-label">Минимальная цена</label>
+                            <input type="number" class="form-control" id="min_price" name="min_price" min="0" step="100">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="max_price" class="form-label">Максимальная цена</label>
+                            <input type="number" class="form-control" id="max_price" name="max_price" min="0" step="100">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="has_restaurant" name="has_restaurant">
+                            <label class="form-check-label" for="has_restaurant">Наличие ресторана</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="has_pool_sauna" name="has_pool_sauna">
+                            <label class="form-check-label" for="has_pool_sauna">Наличие бассейна/сауны</label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin_queries.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Назад к списку запросов
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Выполнить запрос
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

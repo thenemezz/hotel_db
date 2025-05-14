@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование номера — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Редактирование номера {{ room.room_number }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <a href="{{ url_for('room.show', room_id=room.id) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Назад к номеру
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form action="{{ url_for('room.edit', room_id=room.id) }}" method="post">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="hotel_id" class="form-label">Отель <span class="text-danger">*</span></label>
+                        <select class="form-select" id="hotel_id" name="hotel_id" required>
+                            {% for hotel in hotels %}
+                                <option value="{{ hotel.id }}" {% if room.hotel_id == hotel.id %}selected{% endif %}>
+                                    {{ hotel.name }} 
+                                    {% for i in range(hotel.rating) %}⭐{% endfor %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="floor_number" class="form-label">Этаж <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="floor_number" name="floor_number" min="1" 
+                              value="{{ room.floor_number }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="room_number" class="form-label">Номер комнаты <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="room_number" name="room_number" 
+                              value="{{ room.room_number }}" required>
+                        <div class="form-text">Например: 101, 202A, 303B и т.д.</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="room_capacity" class="form-label">Вместимость (чел.) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="room_capacity" name="room_capacity" min="1" 
+                              value="{{ room.room_capacity }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="base_rate" class="form-label">Базовая цена за сутки (руб.) <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="base_rate" name="base_rate" min="0" step="0.01" 
+                              value="{{ room.base_rate }}" required>
+                    </div>
+                    
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="is_available" name="is_available" 
+                              {% if room.is_available %}checked{% endif %}>
+                        <label class="form-check-label" for="is_available">Доступен для бронирования</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Сохранить изменения
+                </button>
+                <a href="{{ url_for('room.show', room_id=room.id) }}" class="btn btn-outline-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

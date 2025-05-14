@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Информация об услуге — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Информация об услуге{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-concierge-bell"></i> {{ service_usage.service_name }}</h5>
+                <div>
+                    <a href="{{ url_for('service.edit', service_usage_id=service_usage.id) }}" class="btn btn-sm btn-light me-1">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </a>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteServiceModal">
+                        <i class="fas fa-trash"></i> Удалить
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">ID:</div>
+                    <div class="col-md-8">{{ service_usage.id }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Тип услуги:</div>
+                    <div class="col-md-8">{{ service_usage.service_name }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Гость:</div>
+                    <div class="col-md-8">{{ service_usage.guest_name }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Дата оказания:</div>
+                    <div class="col-md-8">{{ service_usage.usage_date.strftime('%d.%m.%Y') }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Номер:</div>
+                    <div class="col-md-8">
+                        {% if service_usage.room_number %}
+                            {{ service_usage.room_number }} ({{ service_usage.hotel_name }})
+                        {% else %}
+                            Не указан
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Стоимость:</div>
+                    <div class="col-md-8">{{ service_usage.cost }} ₽</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Статус оплаты:</div>
+                    <div class="col-md-8">
+                        {% if service_usage.paid %}
+                            <span class="badge bg-success">Оплачено</span>
+                        {% else %}
+                            <span class="badge bg-warning">Не оплачено</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                {% if not service_usage.paid %}
+                <form method="post" action="{{ url_for('service.mark_as_paid', service_usage_id=service_usage.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Отметить как оплаченную
+                    </button>
+                </form>
+                {% endif %}
+                <a href="{{ url_for('service.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Назад к списку
+                </a>
+            </div>
+        </div>
+        
+        <!-- Модальное окно подтверждения удаления -->
+        <div class="modal fade" id="deleteServiceModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Подтвердите удаление</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Вы действительно хотите удалить услугу "{{ service_usage.service_name }}"?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <form action="{{ url_for('service.delete', service_usage_id=service_usage.id) }}" method="post">
+                            <button type="submit" class="btn btn-danger">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
