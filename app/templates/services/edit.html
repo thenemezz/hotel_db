@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование услуги — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Редактирование услуги{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-edit"></i> Редактирование данных услуги</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('service.edit', service_usage_id=service_usage.id) }}">
+                    <div class="mb-3">
+                        <label for="guest_id" class="form-label">Гость</label>
+                        <select class="form-select" id="guest_id" name="guest_id" required>
+                            {% for guest in guests %}
+                            <option value="{{ guest.id }}" {% if guest.id == service_usage.guest_id %}selected{% endif %}>
+                                {{ guest.last_name }} {{ guest.first_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="service_type_id" class="form-label">Тип услуги</label>
+                        <select class="form-select" id="service_type_id" name="service_type_id" required>
+                            {% for service_type in service_types %}
+                            <option value="{{ service_type.id }}" {% if service_type.id == service_usage.service_type_id %}selected{% endif %}
+                                    data-price="{{ service_type.base_price }}">
+                                {{ service_type.name }} ({{ service_type.base_price }} ₽)
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="booking_id" class="form-label">Бронирование (необязательно)</label>
+                        <select class="form-select" id="booking_id" name="booking_id">
+                            <option value="">-- Выберите бронирование --</option>
+                            {% for booking in bookings %}
+                            <option value="{{ booking.id }}" {% if booking.id == service_usage.booking_id %}selected{% endif %}>
+                                ID: {{ booking.id }} ({{ booking.check_in_date.strftime('%d.%m.%Y') }} - {{ booking.check_out_date.strftime('%d.%m.%Y') }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="room_id" class="form-label">Номер (необязательно)</label>
+                        <select class="form-select" id="room_id" name="room_id">
+                            <option value="">-- Выберите номер --</option>
+                            {% for room in rooms %}
+                            <option value="{{ room.id }}" {% if room.id == service_usage.room_id %}selected{% endif %}>
+                                {{ room.hotel_name }} - Номер {{ room.room_number }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="usage_date" class="form-label">Дата использования</label>
+                            <input type="date" class="form-control" id="usage_date" name="usage_date" value="{{ service_usage.usage_date.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cost" class="form-label">Стоимость, ₽</label>
+                            <input type="number" step="0.01" min="0" class="form-control" id="cost" name="cost" value="{{ service_usage.cost }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="paid" name="paid" {% if service_usage.paid %}checked{% endif %}>
+                        <label class="form-check-label" for="paid">Оплачено</label>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('service.show', service_usage_id=service_usage.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Назад
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    // Автоматическое обновление стоимости при выборе типа услуги
+    document.getElementById('service_type_id').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const basePrice = selectedOption.getAttribute('data-price');
+        document.getElementById('cost').value = basePrice;
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

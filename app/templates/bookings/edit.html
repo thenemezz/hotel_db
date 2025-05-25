@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование бронирования — Гостиничный комплекс{% endblock %}
+
+{% block page_title %}Редактирование бронирования №{{ booking.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-edit"></i> Редактирование данных бронирования</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('booking.edit', booking_id=booking.id) }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Тип бронирования</label>
+                            <div class="form-control bg-light">
+                                {% if booking.guest_id %}
+                                <i class="fas fa-user"></i> Индивидуальное
+                                {% elif booking.firm_id %}
+                                <i class="fas fa-building"></i> Корпоративное
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            {% if booking.guest_id %}
+                            <label for="guest_id" class="form-label">Гость</label>
+                            <select class="form-select" id="guest_id" name="guest_id" required>
+                                {% for guest in guests %}
+                                <option value="{{ guest.id }}" {% if guest.id == booking.guest_id %}selected{% endif %}>
+                                    {{ guest.last_name }} {{ guest.first_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% elif booking.firm_id %}
+                            <label for="firm_id" class="form-label">Фирма</label>
+                            <select class="form-select" id="firm_id" name="firm_id" required>
+                                {% for firm in firms %}
+                                <option value="{{ firm.id }}" {% if firm.id == booking.firm_id %}selected{% endif %}>
+                                    {{ firm.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="check_in_date" class="form-label">Дата заезда</label>
+                            <input type="date" class="form-control" id="check_in_date" name="check_in_date" value="{{ booking.check_in_date.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="check_out_date" class="form-label">Дата выезда</label>
+                            <input type="date" class="form-control" id="check_out_date" name="check_out_date" value="{{ booking.check_out_date.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="total_rooms" class="form-label">Количество номеров</label>
+                            <input type="number" class="form-control" id="total_rooms" name="total_rooms" value="{{ booking.total_rooms }}" min="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="total_persons" class="form-label">Количество гостей</label>
+                            <input type="number" class="form-control" id="total_persons" name="total_persons" value="{{ booking.total_persons }}" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Статус</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="Забронировано" {% if booking.status == 'Забронировано' %}selected{% endif %}>Забронировано</option>
+                            <option value="Отменено" {% if booking.status == 'Отменено' %}selected{% endif %}>Отменено</option>
+                            <option value="Завершено" {% if booking.status == 'Завершено' %}selected{% endif %}>Завершено</option>
+                        </select>
+                    </div>
+
+                    <h5 class="mt-4 mb-3">Выбранные номера</h5>
+
+                    <div class="mb-3">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Отель</th>
+                                        <th>Номер</th>
+                                        <th>Этаж</th>
+                                        <th>Вместимость</th>
+                                        <th>Цена за ночь</th>
+                                        <th>Выбрать</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for room in available_rooms %}
+                                    <tr>
+                                        <td>{{ room.hotel_name }}</td>
+                                        <td>{{ room.room_number }}</td>
+                                        <td>{{ room.floor_number }}</td>
+                                        <td>{{ room.room_capacity }}</td>
+                                        <td>{{ room.base_rate }} ₽</td>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input" name="room_ids" value="{{ room.id }}"
+                                            {% if room.id in selected_room_ids %}checked{% endif %}>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('booking.show', booking_id=booking.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Назад
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
